@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project name="Buildmanagement" default="main" basedir=".">
+
+	<property name="src.dir" location="." />
+	<property name="build.dir" location="build" />
+	<property name="docs.dir" location="${build.dir}/docs" />
+	<property name="jar.dir" location="${build.dir}/jar" />
+	<property name="test.dir" location="src/test/java" />
+	<property name="test.report.dir" location="testreport" />
+
+	<path id="junit.class.path">
+		<pathelement location="/Users/maltewestendorf/.gradle/caches/modules-2/files-2.1/junit/junit/4.4/8f35ee1f35d2dadbb5029991449ee90c1bab4d4a/junit-4.4.jar" />
+		<pathelement location="${build.dir}" />
+	</path>
+
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${test.report.dir}" />
+	</target>
+
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${test.report.dir}" />
+	</target>
+
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath refid="junit.class.path" />
+		</javac>
+	</target>
+
+	<target name="junit" depends="compile">
+		<junit printsummary="on" fork="true" haltonfailure="yes">
+			<classpath refid="junit.class.path" />
+			<formatter type="xml" />
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="docs" depends="compile">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<path id="build.classpath">
+		<fileset dir="${jar.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="main" depends="compile, junit, docs">
+		<description>Execute all important targets</description>
+	</target>
+
+</project>
